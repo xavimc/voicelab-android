@@ -4,7 +4,7 @@ import java.util.Locale
 
 /**
  * A fixed list shaped like what a device with Google's TTS engine reports.
- * Replaced by the real engine's voices in session 3; see docs/adr/0001-own-voice-model.md.
+ * The app reads the real engine's voices (TtsVoiceSource); this list feeds previews and tests.
  */
 object SampleVoices {
     val all: List<VoiceOption> = listOf(

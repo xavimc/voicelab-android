@@ -2,40 +2,54 @@ package io.github.xavimc.voicelab.voices
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.xavimc.voicelab.ui.theme.VoiceLabTheme
 import java.util.Locale
 
 @Composable
-fun VoiceListScreen(modifier: Modifier = Modifier) {
-    var selectedVoiceName by rememberSaveable { mutableStateOf<String?>(null) }
-
-    VoiceList(
-        voices = SampleVoices.all,
-        selectedVoiceName = selectedVoiceName,
-        onVoiceSelected = { selectedVoiceName = it },
-        modifier = modifier,
-    )
+fun VoiceListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: VoiceListViewModel = viewModel(factory = VoiceListViewModel.Factory),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    when (val state = uiState) {
+        VoiceListUiState.Loading ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        VoiceListUiState.EngineUnavailable ->
+            Text("No text-to-speech engine available", modifier.padding(16.dp))
+        is VoiceListUiState.Ready ->
+            VoiceList(
+                voices = state.voices,
+                selectedVoiceName = state.selectedVoiceName,
+                onVoiceSelected = viewModel::selectVoice,
+                modifier = modifier,
+            )
+    }
 }
 
 @Composable
@@ -106,14 +120,14 @@ private fun VoiceOption.details(): String = buildList {
 @Composable
 private fun VoiceListDarkPreview() {
     VoiceLabTheme {
-        VoiceListScreen()
+        VoiceList(voices = SampleVoices.all, selectedVoiceName = "es-es-x-eea-local", onVoiceSelected = {})
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun VoiceListScreenPreview() {
+private fun VoiceListPreview() {
     VoiceLabTheme {
-        VoiceListScreen()
+        VoiceList(voices = SampleVoices.all, selectedVoiceName = null, onVoiceSelected = {})
     }
 }
