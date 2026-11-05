@@ -5,8 +5,7 @@
 A playground for Android's platform text-to-speech API (`android.speech.tts.TextToSpeech`),
 built with Jetpack Compose.
 
-**Status:** early. Right now this is the empty app and the CI pipeline. Features and tests
-land one commit at a time.
+**Status:** in progress. Done so far: a voice list grouped by language (stateless Compose UI, hoisted selection, own theme) and real engine voices through a ViewModel (StateFlow, SavedStateHandle, mapping, unit tests). Design decisions are recorded as ADRs in the repo. Next: playback controls.
 
 ## Build
 
